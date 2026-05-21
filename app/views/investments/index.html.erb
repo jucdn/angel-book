@@ -1,0 +1,99 @@
+<div class="flex items-center justify-between mb-6">
+  <h1 class="text-2xl font-bold">Investissements</h1>
+  <%= link_to "+ Nouvel investissement", new_investment_path,
+      class: "bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors" %>
+</div>
+
+<%= turbo_frame_tag "investments_list" do %>
+  <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div class="p-4 border-b border-gray-800">
+      <%= form_with url: investments_path, method: :get,
+          data: { turbo_frame: "investments_list" },
+          class: "flex flex-wrap gap-3 items-center" do |f| %>
+
+        <%= f.text_field :q, value: params[:q], placeholder: "🔍 Rechercher...",
+            class: "bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500 w-48" %>
+
+        <%= f.select :sector,
+            [["Tous secteurs", ""]] + Investment::SECTORS.map { |s| [s.humanize, s] },
+            { selected: params[:sector] },
+            class: "bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none" %>
+
+        <%= f.select :status,
+            [["Tous statuts", ""], ["Actifs", "active"], ["Sorties", "exited"], ["Write-offs", "written_off"]],
+            { selected: params[:status] },
+            class: "bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none" %>
+
+        <%= f.submit "Filtrer",
+            class: "bg-gray-700 hover:bg-gray-600 text-gray-200 text-sm px-4 py-2 rounded-lg cursor-pointer transition-colors" %>
+      <% end %>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-xs text-gray-500 uppercase tracking-wider border-b border-gray-800">
+            <th class="text-left px-4 py-3">Société</th>
+            <th class="text-left px-4 py-3">Secteur</th>
+            <th class="text-right px-4 py-3">Investi</th>
+            <th class="text-right px-4 py-3">Val. estimée</th>
+            <th class="text-right px-4 py-3">Multiple</th>
+            <th class="text-right px-4 py-3">MRR</th>
+            <th class="text-center px-4 py-3">Runway</th>
+            <th class="text-center px-4 py-3">Statut</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-800">
+          <% @investments.each do |inv| %>
+            <% latest = inv.latest_snapshot %>
+            <tr class="hover:bg-gray-800/50 cursor-pointer transition-colors"
+                onclick="window.location='<%= investment_path(inv) %>'">
+              <td class="px-4 py-3 font-medium text-white"><%= inv.company_name %></td>
+              <td class="px-4 py-3 text-gray-400"><%= inv.sector&.humanize || "—" %></td>
+              <td class="px-4 py-3 text-right">€<%= number_with_delimiter(inv.invested_amount.to_i) %></td>
+              <td class="px-4 py-3 text-right <%= latest&.current_valuation ? 'text-green-400' : 'text-gray-600' %>">
+                <%= latest&.current_valuation ? "€#{number_with_delimiter(latest.current_valuation.to_i)}" : "—" %>
+              </td>
+              <td class="px-4 py-3 text-right text-blue-400">
+                <%= inv.multiple ? "#{number_with_precision(inv.multiple, precision: 1)}×" : "—" %>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <%= latest&.mrr ? "€#{number_with_delimiter(latest.mrr.to_i)}" : "—" %>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <% if latest&.runway_months %>
+                  <% critical = latest.runway_months < 6 %>
+                  <span class="<%= critical ? 'text-red-400 font-bold' : 'text-green-400' %>">
+                    <%= "⚠ " if critical %><%= latest.runway_months %> mois
+                  </span>
+                <% else %>
+                  <span class="text-gray-600">—</span>
+                <% end %>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <% badge = case inv.status
+                   when "active"      then "bg-green-900/50 text-green-400 border-green-800"
+                   when "exited"      then "bg-yellow-900/50 text-yellow-400 border-yellow-800"
+                   when "written_off" then "bg-gray-800 text-gray-500 border-gray-700"
+                   end %>
+                <span class="text-xs px-2 py-1 rounded-full border <%= badge %>">
+                  <%= inv.status == "written_off" ? "Write-off" : inv.status.capitalize %>
+                </span>
+              </td>
+            </tr>
+          <% end %>
+
+          <% if @investments.empty? %>
+            <tr>
+              <td colspan="8" class="px-4 py-12 text-center text-gray-500">
+                Aucun investissement.
+                <%= link_to "Créer le premier", new_investment_path,
+                    class: "text-violet-400 hover:underline ml-1" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>

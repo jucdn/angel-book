@@ -1,0 +1,184 @@
+<div class="flex items-center justify-between mb-6">
+  <div class="flex items-center gap-3 flex-wrap">
+    <%= link_to "← Investissements", investments_path,
+        class: "text-gray-500 hover:text-gray-300 text-sm transition-colors" %>
+    <h1 class="text-2xl font-bold"><%= @investment.company_name %></h1>
+    <% badge = case @investment.status
+       when "active"      then "bg-green-900/50 text-green-400 border-green-800"
+       when "exited"      then "bg-yellow-900/50 text-yellow-400 border-yellow-800"
+       when "written_off" then "bg-gray-800 text-gray-500 border-gray-700"
+       end %>
+    <span class="text-xs px-2 py-1 rounded-full border <%= badge %>">
+      <%= @investment.status == "written_off" ? "Write-off" : @investment.status.capitalize %>
+    </span>
+  </div>
+  <div class="flex gap-3">
+    <%= link_to "Modifier", edit_investment_path(@investment),
+        class: "text-sm text-gray-400 hover:text-gray-200 border border-gray-700 px-3 py-1.5 rounded-lg transition-colors" %>
+    <%= button_to "Supprimer", investment_path(@investment), method: :delete,
+        class: "text-sm text-red-400 hover:text-red-300 border border-red-900 px-3 py-1.5 rounded-lg transition-colors bg-transparent cursor-pointer",
+        data: { turbo_confirm: "Supprimer cet investissement et tous ses snapshots ?" } %>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+  <%# Left: fixed entry data %>
+  <div class="bg-gray-900 rounded-xl border border-gray-800 p-6">
+    <h2 class="text-xs text-gray-500 uppercase tracking-wider mb-4">Données d'entrée</h2>
+    <dl class="space-y-3 text-sm">
+      <div class="flex justify-between">
+        <dt class="text-gray-400">Ticket investi</dt>
+        <dd class="font-medium">€<%= number_with_delimiter(@investment.invested_amount.to_i) %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-400">Valorisation pre-money</dt>
+        <dd><%= @investment.entry_valuation ? "€#{number_with_delimiter(@investment.entry_valuation.to_i)}" : "—" %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-400">% equity</dt>
+        <dd><%= @investment.equity_percentage ? "#{@investment.equity_percentage}%" : "—" %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-400">Date</dt>
+        <dd><%= @investment.investment_date.strftime("%B %Y") %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-400">Secteur</dt>
+        <dd><%= @investment.sector&.humanize || "—" %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-400">Stade</dt>
+        <dd><%= @investment.stage&.humanize || "—" %></dd>
+      </div>
+      <% if @investment.website.present? %>
+        <div class="flex justify-between">
+          <dt class="text-gray-400">Site web</dt>
+          <dd><%= link_to @investment.website, @investment.website, target: "_blank",
+                  rel: "noopener", class: "text-violet-400 hover:underline truncate max-w-48" %></dd>
+        </div>
+      <% end %>
+    </dl>
+    <% if @investment.description.present? %>
+      <div class="mt-4 pt-4 border-t border-gray-800">
+        <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Thèse</p>
+        <p class="text-sm text-gray-300"><%= @investment.description %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Right: latest snapshot + Turbo Frame for inline form %>
+  <div class="bg-gray-900 rounded-xl border border-gray-800 p-6">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xs text-gray-500 uppercase tracking-wider">Dernière mise à jour</h2>
+      <%= link_to "+ Update", new_investment_snapshot_path(@investment),
+          class: "text-sm bg-violet-600 hover:bg-violet-500 text-white px-3 py-1.5 rounded-lg transition-colors",
+          data: { turbo_frame: "snapshot_form" } %>
+    </div>
+
+    <% if @latest_snapshot %>
+      <% multiple = @investment.multiple %>
+      <% multiple_positive = multiple && multiple > 1 %>
+      <dl class="space-y-3 text-sm">
+        <div class="flex justify-between">
+          <dt class="text-gray-400">Valorisation estimée</dt>
+          <dd class="font-medium <%= multiple_positive ? 'text-green-400' : 'text-gray-100' %>">
+            <% if @latest_snapshot.current_valuation %>
+              €<%= number_with_delimiter(@latest_snapshot.current_valuation.to_i) %>
+              <span class="text-gray-500 text-xs ml-1">(<%= number_with_precision(multiple, precision: 1) %>×)</span>
+            <% else %>
+              —
+            <% end %>
+          </dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-gray-400">MRR</dt>
+          <dd><%= @latest_snapshot.mrr ? "€#{number_with_delimiter(@latest_snapshot.mrr.to_i)}" : "—" %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-gray-400">ARR</dt>
+          <dd><%= @latest_snapshot.arr ? "€#{number_with_delimiter(@latest_snapshot.arr.to_i)}" : "—" %></dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-gray-400">Runway</dt>
+          <% runway_critical = @latest_snapshot.runway_months.present? && @latest_snapshot.runway_months < 6 %>
+          <dd class="<%= runway_critical ? 'text-red-400 font-bold' : '' %>">
+            <%= @latest_snapshot.runway_months ? "#{@latest_snapshot.runway_months} mois" : "—" %>
+            <%= " ⚠" if runway_critical %>
+          </dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-gray-400">Effectifs</dt>
+          <dd><%= @latest_snapshot.headcount || "—" %></dd>
+        </div>
+        <% if @latest_snapshot.last_round_amount.present? %>
+          <div class="flex justify-between">
+            <dt class="text-gray-400">Dernier tour</dt>
+            <dd>€<%= number_with_delimiter(@latest_snapshot.last_round_amount.to_i) %>
+              <% if @latest_snapshot.last_round_date %>
+                <span class="text-gray-500 text-xs">— <%= @latest_snapshot.last_round_date.strftime("%b %Y") %></span>
+              <% end %>
+            </dd>
+          </div>
+        <% end %>
+        <% if @latest_snapshot.notes.present? %>
+          <div class="pt-3 border-t border-gray-800">
+            <p class="text-xs text-gray-500 mb-1">Notes</p>
+            <p class="text-gray-300"><%= @latest_snapshot.notes %></p>
+          </div>
+        <% end %>
+      </dl>
+      <p class="text-xs text-gray-600 mt-4">Mis à jour le <%= @latest_snapshot.snapshot_date.strftime("%d/%m/%Y") %></p>
+    <% else %>
+      <p class="text-gray-500 text-sm">Aucune donnée. Ajoute une première mise à jour.</p>
+    <% end %>
+
+    <%# Inline snapshot form loads here when "+ Update" is clicked %>
+    <%= turbo_frame_tag "snapshot_form" %>
+  </div>
+</div>
+
+<%# Snapshot history table %>
+<% if @snapshots.any? %>
+  <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-800">
+      <h2 class="text-sm font-medium text-gray-300">Historique des mises à jour</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-xs text-gray-500 uppercase tracking-wider border-b border-gray-800">
+            <th class="text-left px-6 py-3">Date</th>
+            <th class="text-right px-6 py-3">Val. estimée</th>
+            <th class="text-right px-6 py-3">MRR</th>
+            <th class="text-right px-6 py-3">ARR</th>
+            <th class="text-center px-6 py-3">Runway</th>
+            <th class="text-center px-6 py-3">Effectifs</th>
+            <th class="text-left px-6 py-3">Notes</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-800">
+          <% @snapshots.each do |snap| %>
+            <% snap_critical = snap.runway_months.present? && snap.runway_months < 6 %>
+            <tr class="hover:bg-gray-800/30 transition-colors">
+              <td class="px-6 py-3 text-gray-300"><%= snap.snapshot_date.strftime("%d/%m/%Y") %></td>
+              <td class="px-6 py-3 text-right text-green-400">
+                <%= snap.current_valuation ? "€#{number_with_delimiter(snap.current_valuation.to_i)}" : "—" %>
+              </td>
+              <td class="px-6 py-3 text-right">
+                <%= snap.mrr ? "€#{number_with_delimiter(snap.mrr.to_i)}" : "—" %>
+              </td>
+              <td class="px-6 py-3 text-right">
+                <%= snap.arr ? "€#{number_with_delimiter(snap.arr.to_i)}" : "—" %>
+              </td>
+              <td class="px-6 py-3 text-center <%= snap_critical ? 'text-red-400' : '' %>">
+                <%= snap.runway_months ? "#{snap.runway_months} mois" : "—" %>
+              </td>
+              <td class="px-6 py-3 text-center"><%= snap.headcount || "—" %></td>
+              <td class="px-6 py-3 text-gray-400 max-w-xs truncate"><%= snap.notes || "—" %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,10 @@
+<div class="max-w-2xl">
+  <div class="flex items-center gap-3 mb-6">
+    <%= link_to "← Retour", investments_path, class: "text-gray-500 hover:text-gray-300 text-sm transition-colors" %>
+    <h1 class="text-2xl font-bold">Nouvel investissement</h1>
+  </div>
+
+  <div class="bg-gray-900 rounded-xl border border-gray-800 p-6">
+    <%= render "form", investment: @investment %>
+  </div>
+</div>

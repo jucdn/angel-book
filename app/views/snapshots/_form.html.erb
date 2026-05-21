@@ -1,0 +1,74 @@
+<%= form_with model: [ investment, snapshot ], class: "space-y-4" do |f| %>
+  <% if snapshot.errors.any? %>
+    <div class="bg-red-900/50 border border-red-700 text-red-300 px-3 py-2 rounded-lg text-xs">
+      <ul class="list-disc list-inside">
+        <% snapshot.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div class="col-span-2">
+      <%= f.label :snapshot_date, "Date de mise à jour", class: "block text-xs text-gray-400 mb-1" %>
+      <%= f.date_field :snapshot_date,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :current_valuation, "Valorisation estimée (€)", class: "block text-xs text-gray-400 mb-1" %>
+      <%= f.number_field :current_valuation, step: 1000, min: 0,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :runway_months, "Runway (mois)", class: "block text-xs text-gray-400 mb-1" %>
+      <%= f.number_field :runway_months, step: 1, min: 0,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :mrr, "MRR (€)", class: "block text-xs text-gray-400 mb-1" %>
+      <%= f.number_field :mrr, step: 100, min: 0,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :arr, "ARR (€)", class: "block text-xs text-gray-400 mb-1" %>
+      <%= f.number_field :arr, step: 1000, min: 0,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :headcount, "Effectifs", class: "block text-xs text-gray-400 mb-1" %>
+      <%= f.number_field :headcount, step: 1, min: 0,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :last_round_amount, "Montant dernier tour (€)", class: "block text-xs text-gray-400 mb-1" %>
+      <%= f.number_field :last_round_amount, step: 10_000, min: 0,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :last_round_date, "Date dernier tour", class: "block text-xs text-gray-400 mb-1" %>
+      <%= f.date_field :last_round_date,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div class="col-span-2">
+      <%= f.label :notes, "Notes", class: "block text-xs text-gray-400 mb-1" %>
+      <%= f.text_area :notes, rows: 2,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+  </div>
+
+  <div class="flex gap-3 pt-1">
+    <%= f.submit "Enregistrer",
+        class: "bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer transition-colors" %>
+    <%= link_to "Annuler", investment_path(investment),
+        class: "text-gray-400 hover:text-gray-200 text-sm px-3 py-2 transition-colors" %>
+  </div>
+<% end %>

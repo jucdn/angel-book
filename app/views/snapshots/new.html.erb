@@ -1,0 +1,6 @@
+<%= turbo_frame_tag "snapshot_form" do %>
+  <div class="mt-4 pt-4 border-t border-gray-700">
+    <p class="text-xs text-gray-500 uppercase tracking-wider mb-3">Nouvelle mise à jour</p>
+    <%= render "form", investment: @investment, snapshot: @snapshot %>
+  </div>
+<% end %>

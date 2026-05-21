@@ -1,0 +1,87 @@
+<%= form_with model: investment, class: "space-y-6" do |f| %>
+  <% if investment.errors.any? %>
+    <div class="bg-red-900/50 border border-red-700 text-red-300 px-4 py-3 rounded-lg text-sm">
+      <ul class="list-disc list-inside space-y-1">
+        <% investment.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="md:col-span-2">
+      <%= f.label :company_name, "Nom de la société", class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.text_field :company_name,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :sector, "Secteur", class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.select :sector,
+          [["— Choisir —", ""]] + Investment::SECTORS.map { |s| [s.humanize, s] },
+          {},
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :stage, "Stade", class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.select :stage,
+          [["— Choisir —", ""]] + Investment::STAGES.map { |s| [s.humanize, s] },
+          {},
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :invested_amount, "Ticket investi (€)", class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.number_field :invested_amount, step: 1000, min: 0,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :entry_valuation, "Valorisation pre-money (€)", class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.number_field :entry_valuation, step: 10_000, min: 0,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :equity_percentage, "% equity détenu", class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.number_field :equity_percentage, step: 0.01, min: 0, max: 100,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :investment_date, "Date d'investissement", class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.date_field :investment_date,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :status, "Statut", class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.select :status,
+          [["Actif", "active"], ["Sorti", "exited"], ["Write-off", "written_off"]],
+          {},
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
+      <%= f.label :website, "Site web", class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.url_field :website, placeholder: "https://...",
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div class="md:col-span-2">
+      <%= f.label :description, "Description / thèse", class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.text_area :description, rows: 3,
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+  </div>
+
+  <div class="flex gap-3 pt-2">
+    <%= f.submit investment.new_record? ? "Créer l'investissement" : "Enregistrer",
+        class: "bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-5 py-2 rounded-lg cursor-pointer transition-colors" %>
+    <%= link_to "Annuler",
+        investment.new_record? ? investments_path : investment_path(investment),
+        class: "text-gray-400 hover:text-gray-200 text-sm px-4 py-2 transition-colors" %>
+  </div>
+<% end %>
