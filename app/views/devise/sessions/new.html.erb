@@ -1,0 +1,36 @@
+<div class="min-h-screen flex items-center justify-center">
+  <div class="w-full max-w-sm">
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-bold text-white">Angel Book</h1>
+      <p class="text-gray-500 text-sm mt-1">Connecte-toi pour accéder à ton portefeuille</p>
+    </div>
+
+    <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+      <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+        <div class="space-y-4">
+          <div>
+            <%= f.label :email, "Email", class: "block text-sm text-gray-400 mb-1" %>
+            <%= f.email_field :email, autofocus: true, autocomplete: "email",
+                class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+          </div>
+
+          <div>
+            <%= f.label :password, "Mot de passe", class: "block text-sm text-gray-400 mb-1" %>
+            <%= f.password_field :password, autocomplete: "current-password",
+                class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+          </div>
+
+          <% if devise_mapping.rememberable? %>
+            <div class="flex items-center gap-2">
+              <%= f.check_box :remember_me, class: "rounded border-gray-700 bg-gray-800 text-violet-600" %>
+              <%= f.label :remember_me, "Se souvenir de moi", class: "text-sm text-gray-400" %>
+            </div>
+          <% end %>
+
+          <%= f.submit "Se connecter",
+              class: "w-full bg-violet-600 hover:bg-violet-500 text-white font-medium py-2 rounded-lg cursor-pointer transition-colors text-sm mt-2" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
