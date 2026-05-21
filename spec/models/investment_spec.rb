@@ -44,4 +44,110 @@ RSpec.describe Investment, type: :model do
       end
     end
   end
+
+  describe "instance methods" do
+    let(:investment) { create(:investment, invested_amount: 50_000) }
+
+    describe "#latest_snapshot" do
+      it "returns the most recent snapshot by date" do
+        create(:snapshot, investment: investment, snapshot_date: 1.year.ago.to_date, current_valuation: 40_000)
+        recent = create(:snapshot, investment: investment, snapshot_date: 1.month.ago.to_date, current_valuation: 80_000)
+        expect(investment.latest_snapshot).to eq(recent)
+      end
+
+      it "returns nil when there are no snapshots" do
+        expect(investment.latest_snapshot).to be_nil
+      end
+    end
+
+    describe "#current_valuation" do
+      it "returns current_valuation from the latest snapshot" do
+        create(:snapshot, investment: investment, snapshot_date: Date.today, current_valuation: 90_000)
+        expect(investment.current_valuation).to eq(90_000)
+      end
+
+      it "returns nil with no snapshots" do
+        expect(investment.current_valuation).to be_nil
+      end
+    end
+
+    describe "#multiple" do
+      it "calculates current_valuation / invested_amount" do
+        create(:snapshot, investment: investment, snapshot_date: Date.today, current_valuation: 150_000)
+        expect(investment.multiple).to be_within(0.01).of(3.0)
+      end
+
+      it "returns nil with no snapshots" do
+        expect(investment.multiple).to be_nil
+      end
+    end
+
+    describe "#runway_alert?" do
+      it "returns true when runway_months < 6" do
+        create(:snapshot, investment: investment, snapshot_date: Date.today, runway_months: 4)
+        expect(investment.runway_alert?).to be true
+      end
+
+      it "returns false when runway_months >= 6" do
+        create(:snapshot, investment: investment, snapshot_date: Date.today, runway_months: 12)
+        expect(investment.runway_alert?).to be false
+      end
+
+      it "returns false when runway is nil" do
+        create(:snapshot, investment: investment, snapshot_date: Date.today, runway_months: nil)
+        expect(investment.runway_alert?).to be false
+      end
+    end
+  end
+
+  describe "class methods" do
+    before do
+      @inv_active = create(:investment, invested_amount: 50_000, status: "active")
+      create(:snapshot, investment: @inv_active, snapshot_date: Date.today, current_valuation: 120_000)
+
+      @inv_exited = create(:investment, invested_amount: 30_000, status: "exited")
+      create(:snapshot, investment: @inv_exited, snapshot_date: 1.month.ago.to_date, current_valuation: 90_000)
+
+      @inv_woff = create(:investment, invested_amount: 20_000, status: "written_off")
+    end
+
+    describe ".total_invested" do
+      it "sums invested_amount across all statuses" do
+        expect(Investment.total_invested).to eq(100_000)
+      end
+    end
+
+    describe ".total_estimated_value" do
+      it "sums latest current_valuation for active and exited only" do
+        expect(Investment.total_estimated_value).to eq(210_000)
+      end
+
+      it "excludes written_off investments" do
+        expect(Investment.total_estimated_value).to eq(210_000)
+      end
+    end
+
+    describe ".tvpi" do
+      it "divides total_estimated_value by total_invested" do
+        expect(Investment.tvpi).to be_within(0.01).of(2.1)
+      end
+
+      it "returns 0 when nothing is invested" do
+        Investment.destroy_all
+        expect(Investment.tvpi).to eq(0)
+      end
+    end
+
+    describe ".runway_alerts_count" do
+      it "counts active investments with latest runway < 6 months" do
+        create(:snapshot, investment: @inv_active, snapshot_date: Date.today + 1, runway_months: 4)
+        expect(Investment.runway_alerts_count).to eq(1)
+      end
+
+      it "does not count exited investments" do
+        create(:snapshot, investment: @inv_exited, snapshot_date: Date.today + 1, runway_months: 3)
+        expect(Investment.runway_alerts_count).to eq(0)
+      end
+    end
+  end
 end
