@@ -1,29 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
   <head>
-    <title><%= content_for(:title) || "Ba Portfolio" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Ba Portfolio">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta charset="utf-8">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
+    <title>BA Portfolio</title>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <%= yield %>
+  <body class="bg-gray-950 text-gray-100 min-h-screen">
+    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-3">
+      <div class="max-w-7xl mx-auto flex items-center gap-8">
+        <span class="font-bold text-white text-lg">BA Portfolio</span>
+        <div class="flex gap-6 text-sm">
+          <%= link_to "Dashboard", root_path,
+              class: "transition-colors #{current_page?(root_path) ? 'text-white font-medium' : 'text-gray-400 hover:text-white'}" %>
+          <%= link_to "Investissements", investments_path,
+              class: "transition-colors #{request.path.start_with?('/investments') ? 'text-white font-medium' : 'text-gray-400 hover:text-white'}" %>
+        </div>
+      </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+      <% if notice %>
+        <div class="mb-6 bg-green-900/50 border border-green-700 text-green-300 px-4 py-3 rounded-lg text-sm">
+          <%= notice %>
+        </div>
+      <% end %>
+      <% if alert %>
+        <div class="mb-6 bg-red-900/50 border border-red-700 text-red-300 px-4 py-3 rounded-lg text-sm">
+          <%= alert %>
+        </div>
+      <% end %>
+
+      <%= yield %>
+    </main>
   </body>
 </html>
