@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    <title>BA Portfolio</title>
+    <title>Angel Book</title>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
@@ -14,7 +14,7 @@
   <body class="bg-gray-950 text-gray-100 min-h-screen">
     <nav class="bg-gray-900 border-b border-gray-800 px-6 py-3">
       <div class="max-w-7xl mx-auto flex items-center gap-8">
-        <span class="font-bold text-white text-lg">BA Portfolio</span>
+        <span class="font-bold text-white text-lg">Angel Book</span>
         <div class="flex gap-6 text-sm">
           <%= link_to "Dashboard", root_path,
               class: "transition-colors #{current_page?(root_path) ? 'text-white font-medium' : 'text-gray-400 hover:text-white'}" %>
