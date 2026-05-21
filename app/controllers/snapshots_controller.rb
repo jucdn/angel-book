@@ -1,5 +1,6 @@
 class SnapshotsController < ApplicationController
   before_action :set_investment
+  before_action :set_snapshot, only: [:destroy]
 
   def new
     @snapshot = @investment.snapshots.new(snapshot_date: Date.today)
@@ -14,10 +15,19 @@ class SnapshotsController < ApplicationController
     end
   end
 
+  def destroy
+    @snapshot.destroy
+    redirect_to @investment, notice: "Mise à jour supprimée."
+  end
+
   private
 
   def set_investment
     @investment = Investment.find(params[:investment_id])
+  end
+
+  def set_snapshot
+    @snapshot = @investment.snapshots.find(params[:id])
   end
 
   def snapshot_params

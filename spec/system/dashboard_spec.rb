@@ -15,9 +15,9 @@ RSpec.describe "Dashboard", type: :system do
     it "displays the KPI cards" do
       visit root_path
 
-      expect(page).to have_content("Capital investi")
-      expect(page).to have_content("Valeur estimée")
-      expect(page).to have_content("Multiple")
+      expect(page).to have_content(/capital investi/i)
+      expect(page).to have_content(/valeur estimée/i)
+      expect(page).to have_content(/multiple/i)
     end
 
     it "shows runway alert section when an active investment has runway < 6 months" do
@@ -26,7 +26,7 @@ RSpec.describe "Dashboard", type: :system do
 
       visit root_path
 
-      expect(page).to have_content("Alertes runway")
+      expect(page).to have_content(/alertes runway/i)
     end
   end
 

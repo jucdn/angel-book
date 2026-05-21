@@ -1,7 +1,7 @@
 <h1 class="text-2xl font-bold mb-6">Portefeuille</h1>
 
 <%# KPI cards %>
-<div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+<div class="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
   <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
     <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Capital investi</p>
     <p class="text-2xl font-bold">€<%= number_with_delimiter(@total_invested.to_i) %></p>
@@ -15,6 +15,17 @@
   <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
     <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Multiple (TVPI)</p>
     <p class="text-2xl font-bold text-blue-400"><%= number_with_precision(@tvpi, precision: 2) %>×</p>
+  </div>
+
+  <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
+    <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">TRI</p>
+    <% if @irr %>
+      <p class="text-2xl font-bold <%= @irr >= 0 ? 'text-green-400' : 'text-red-400' %>">
+        <%= number_with_precision(@irr * 100, precision: 1) %>%
+      </p>
+    <% else %>
+      <p class="text-2xl font-bold text-gray-600">N/A</p>
+    <% end %>
   </div>
 
   <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">

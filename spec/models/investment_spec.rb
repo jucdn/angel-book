@@ -66,7 +66,12 @@ RSpec.describe Investment, type: :model do
         expect(investment.current_valuation).to eq(90_000)
       end
 
-      it "returns nil with no snapshots" do
+      it "returns invested_amount with no snapshots (active investment)" do
+        expect(investment.current_valuation).to eq(investment.invested_amount)
+      end
+
+      it "returns nil with no snapshots for a written_off investment" do
+        investment.update!(status: "written_off")
         expect(investment.current_valuation).to be_nil
       end
     end
@@ -77,8 +82,8 @@ RSpec.describe Investment, type: :model do
         expect(investment.multiple).to be_within(0.01).of(3.0)
       end
 
-      it "returns nil with no snapshots" do
-        expect(investment.multiple).to be_nil
+      it "returns 1.0 with no snapshots (falls back to invested_amount)" do
+        expect(investment.multiple).to be_within(0.01).of(1.0)
       end
     end
 

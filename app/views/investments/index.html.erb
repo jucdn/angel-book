@@ -51,11 +51,26 @@
               <td class="px-4 py-3 font-medium text-white"><%= inv.company_name %></td>
               <td class="px-4 py-3 text-gray-400"><%= inv.sector&.humanize || "—" %></td>
               <td class="px-4 py-3 text-right">€<%= number_with_delimiter(inv.invested_amount.to_i) %></td>
-              <td class="px-4 py-3 text-right <%= latest&.current_valuation ? 'text-green-400' : 'text-gray-600' %>">
-                <%= latest&.current_valuation ? "€#{number_with_delimiter(latest.current_valuation.to_i)}" : "—" %>
+              <td class="px-4 py-3 text-right">
+                <% if inv.realized_exit? %>
+                  <span class="text-yellow-400">€<%= number_with_delimiter(inv.exit_amount.to_i) %></span>
+                  <span class="text-xs text-gray-500 ml-1">cédé</span>
+                <% elsif latest&.current_valuation %>
+                  <span class="text-green-400">€<%= number_with_delimiter(latest.current_valuation.to_i) %></span>
+                <% elsif !inv.written_off? %>
+                  <span class="text-gray-500">€<%= number_with_delimiter(inv.invested_amount.to_i) %></span>
+                <% else %>
+                  <span class="text-gray-600">—</span>
+                <% end %>
               </td>
-              <td class="px-4 py-3 text-right text-blue-400">
-                <%= inv.multiple ? "#{number_with_precision(inv.multiple, precision: 1)}×" : "—" %>
+              <td class="px-4 py-3 text-right">
+                <% if inv.multiple %>
+                  <span class="<%= inv.realized_exit? ? 'text-yellow-400' : 'text-blue-400' %>">
+                    <%= number_with_precision(inv.multiple, precision: 1) %>×
+                  </span>
+                <% else %>
+                  <span class="text-gray-600">—</span>
+                <% end %>
               </td>
               <td class="px-4 py-3 text-right">
                 <%= latest&.mrr ? "€#{number_with_delimiter(latest.mrr.to_i)}" : "—" %>

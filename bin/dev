@@ -1,2 +1,11 @@
-#!/usr/bin/env ruby
-exec "./bin/rails", "server", *ARGV
+#!/usr/bin/env sh
+
+# Start the Tailwind watcher in the background
+bin/rails tailwindcss:watch &
+TAILWIND_PID=$!
+
+# Start the Rails server (in foreground)
+bin/rails server "$@"
+
+# Kill the watcher when Rails stops
+kill $TAILWIND_PID 2>/dev/null

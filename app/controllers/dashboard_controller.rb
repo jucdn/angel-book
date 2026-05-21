@@ -3,6 +3,7 @@ class DashboardController < ApplicationController
     @total_invested        = Investment.total_invested
     @total_estimated_value = Investment.total_estimated_value
     @tvpi                  = Investment.tvpi
+    @irr                   = Investment.portfolio_irr
     @runway_alerts_count   = Investment.runway_alerts_count
     @active_count          = Investment.active.count
     @exited_count          = Investment.exited.count

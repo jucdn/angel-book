@@ -13,6 +13,11 @@
     </span>
   </div>
   <div class="flex gap-3">
+    <% if @investment.active? %>
+      <%= link_to "Enregistrer une sortie", exit_form_investment_path(@investment),
+          class: "text-sm bg-yellow-600 hover:bg-yellow-500 text-white px-3 py-1.5 rounded-lg transition-colors",
+          data: { turbo_frame: "exit_form" } %>
+    <% end %>
     <%= link_to "Modifier", edit_investment_path(@investment),
         class: "text-sm text-gray-400 hover:text-gray-200 border border-gray-700 px-3 py-1.5 rounded-lg transition-colors" %>
     <%= button_to "Supprimer", investment_path(@investment), method: :delete,
@@ -62,6 +67,35 @@
       <div class="mt-4 pt-4 border-t border-gray-800">
         <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Thèse</p>
         <p class="text-sm text-gray-300"><%= @investment.description %></p>
+      </div>
+    <% end %>
+
+    <% if @investment.realized_exit? %>
+      <div class="mt-4 pt-4 border-t border-gray-800">
+        <p class="text-xs text-gray-500 uppercase tracking-wider mb-3">Données de sortie</p>
+        <dl class="space-y-3 text-sm">
+          <div class="flex justify-between">
+            <dt class="text-gray-400">Date de cession</dt>
+            <dd class="font-medium"><%= @investment.exit_date.strftime("%d/%m/%Y") %></dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-400">Montant de cession</dt>
+            <dd class="font-medium text-yellow-400">€<%= number_with_delimiter(@investment.exit_amount.to_i) %></dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-400">Multiple réalisé</dt>
+            <dd class="font-medium <%= @investment.multiple >= 1 ? 'text-green-400' : 'text-red-400' %>">
+              <%= number_with_precision(@investment.multiple, precision: 2) %>×
+            </dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-400">Gain / Perte</dt>
+            <% gain = @investment.exit_amount - @investment.invested_amount %>
+            <dd class="font-medium <%= gain >= 0 ? 'text-green-400' : 'text-red-400' %>">
+              <%= gain >= 0 ? "+" : "" %>€<%= number_with_delimiter(gain.to_i) %>
+            </dd>
+          </div>
+        </dl>
       </div>
     <% end %>
   </div>
@@ -134,6 +168,9 @@
 
     <%# Inline snapshot form loads here when "+ Update" is clicked %>
     <%= turbo_frame_tag "snapshot_form" %>
+
+    <%# Inline exit form loads here when "Enregistrer une sortie" is clicked %>
+    <%= turbo_frame_tag "exit_form" %>
   </div>
 </div>
 
@@ -154,6 +191,7 @@
             <th class="text-center px-6 py-3">Runway</th>
             <th class="text-center px-6 py-3">Effectifs</th>
             <th class="text-left px-6 py-3">Notes</th>
+            <th class="px-6 py-3"></th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-800">
@@ -175,6 +213,11 @@
               </td>
               <td class="px-6 py-3 text-center"><%= snap.headcount || "—" %></td>
               <td class="px-6 py-3 text-gray-400 max-w-xs truncate"><%= snap.notes || "—" %></td>
+              <td class="px-6 py-3 text-right">
+                <%= button_to "×", investment_snapshot_path(@investment, snap), method: :delete,
+                    class: "text-gray-600 hover:text-red-400 text-lg leading-none bg-transparent cursor-pointer transition-colors",
+                    data: { turbo_confirm: "Supprimer cette mise à jour ?" } %>
+              </td>
             </tr>
           <% end %>
         </tbody>

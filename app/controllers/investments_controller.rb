@@ -1,5 +1,5 @@
 class InvestmentsController < ApplicationController
-  before_action :set_investment, only: [ :show, :edit, :update, :destroy ]
+  before_action :set_investment, only: [ :show, :edit, :update, :destroy, :exit_form, :record_exit ]
 
   def index
     @investments = Investment.all
@@ -39,6 +39,17 @@ class InvestmentsController < ApplicationController
     end
   end
 
+  def exit_form
+  end
+
+  def record_exit
+    if @investment.update(exit_params.merge(status: "exited"))
+      redirect_to @investment, notice: "Sortie enregistrée."
+    else
+      render :exit_form, status: :unprocessable_entity
+    end
+  end
+
   def destroy
     @investment.destroy
     redirect_to investments_path, notice: "Investissement supprimé."
@@ -56,5 +67,9 @@ class InvestmentsController < ApplicationController
       :entry_valuation, :equity_percentage, :investment_date,
       :status, :website, :description
     )
+  end
+
+  def exit_params
+    params.require(:investment).permit(:exit_date, :exit_amount)
   end
 end

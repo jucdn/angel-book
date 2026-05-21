@@ -1,0 +1,38 @@
+<%= turbo_frame_tag "exit_form" do %>
+  <div class="mt-6 pt-6 border-t border-gray-700">
+    <p class="text-xs text-gray-500 uppercase tracking-wider mb-4">Enregistrer la sortie</p>
+
+    <%= form_with model: investment, url: record_exit_investment_path(investment), method: :patch, class: "space-y-4" do |f| %>
+      <% if investment.errors.where(:exit_date).any? || investment.errors.where(:exit_amount).any? %>
+        <div class="bg-red-900/50 border border-red-700 text-red-300 px-3 py-2 rounded-lg text-xs">
+          <ul class="list-disc list-inside">
+            <% (investment.errors.where(:exit_date) + investment.errors.where(:exit_amount)).each do |e| %>
+              <li><%= e.full_message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= f.label :exit_date, "Date de cession", class: "block text-xs text-gray-400 mb-1" %>
+          <%= f.date_field :exit_date,
+              class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+        </div>
+
+        <div>
+          <%= f.label :exit_amount, "Montant de cession (€)", class: "block text-xs text-gray-400 mb-1" %>
+          <%= f.number_field :exit_amount, step: 1, min: 0,
+              class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+        </div>
+      </div>
+
+      <div class="flex gap-3">
+        <%= f.submit "Confirmer la sortie",
+            class: "bg-yellow-600 hover:bg-yellow-500 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer transition-colors" %>
+        <%= link_to "Annuler", investment_path(investment),
+            class: "text-gray-400 hover:text-gray-200 text-sm px-3 py-2 transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
