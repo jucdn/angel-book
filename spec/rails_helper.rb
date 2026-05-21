@@ -35,6 +35,10 @@ end
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
 
+  config.before(:each, type: :system) do
+    driven_by :selenium, using: :headless_chrome, screen_size: [ 1400, 800 ]
+  end
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')
