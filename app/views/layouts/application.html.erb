@@ -12,24 +12,24 @@
   </head>
 
   <body class="bg-gray-950 text-gray-100 min-h-screen">
-    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-3">
-      <div class="max-w-7xl mx-auto flex items-center gap-8">
-        <span class="font-bold text-white text-lg">Angel Book</span>
-        <div class="flex gap-6 text-sm">
-          <%= link_to "Dashboard", root_path,
-              class: "transition-colors #{current_page?(root_path) ? 'text-white font-medium' : 'text-gray-400 hover:text-white'}" %>
-          <%= link_to "Investissements", investments_path,
-              class: "transition-colors #{request.path.start_with?('/investments') ? 'text-white font-medium' : 'text-gray-400 hover:text-white'}" %>
-        </div>
-        <% if user_signed_in? %>
+    <% if user_signed_in? %>
+      <nav class="bg-gray-900 border-b border-gray-800 px-6 py-3">
+        <div class="max-w-7xl mx-auto flex items-center gap-8">
+          <span class="font-bold text-white text-lg">Angel Book</span>
+          <div class="flex gap-6 text-sm">
+            <%= link_to "Dashboard", root_path,
+                class: "transition-colors #{current_page?(root_path) ? 'text-white font-medium' : 'text-gray-400 hover:text-white'}" %>
+            <%= link_to "Investissements", investments_path,
+                class: "transition-colors #{request.path.start_with?('/investments') ? 'text-white font-medium' : 'text-gray-400 hover:text-white'}" %>
+          </div>
           <div class="ml-auto flex items-center gap-4 text-sm">
             <span class="text-gray-600"><%= current_user.email %></span>
             <%= button_to "Déconnexion", destroy_user_session_path, method: :delete,
                 class: "text-gray-400 hover:text-gray-200 bg-transparent cursor-pointer transition-colors" %>
           </div>
-        <% end %>
-      </div>
-    </nav>
+        </div>
+      </nav>
+    <% end %>
 
     <main class="max-w-7xl mx-auto px-6 py-8">
       <% if notice %>
