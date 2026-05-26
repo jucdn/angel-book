@@ -24,11 +24,23 @@ class SharesController < ApplicationController
   end
 
   def dashboard
-    head :ok
+    @total_invested        = Investment.total_invested
+    @total_estimated_value = Investment.total_estimated_value
+    @tvpi                  = Investment.tvpi
+    @irr                   = Investment.portfolio_irr
+    @runway_alerts_count   = Investment.runway_alerts_count
+    @active_count          = Investment.active.count
+    @exited_count          = Investment.exited.count
+    @written_off_count     = Investment.written_off.count
+    @sector_breakdown      = Investment.where.not(sector: nil).group(:sector).sum(:invested_amount)
+    @stage_breakdown       = Investment.where.not(stage: nil).group(:stage).sum(:invested_amount)
+    @investments           = Investment.order(investment_date: :desc)
   end
 
   def investment
-    head :ok
+    @investment      = Investment.find(params[:id])
+    @snapshots       = @investment.snapshots.order(snapshot_date: :desc)
+    @latest_snapshot = @investment.latest_snapshot
   end
 
   def sign_out

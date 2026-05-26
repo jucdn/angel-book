@@ -51,4 +51,38 @@ RSpec.describe "Shares", type: :request do
       expect(response).to redirect_to(share_path(token))
     end
   end
+
+  describe "GET /share/:token/dashboard" do
+    it "404s without a valid session" do
+      get share_dashboard_path(token)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "renders with a valid session and lists the investments" do
+      create(:investment, company_name: "Acme Robotics")
+      post unlock_share_path(token), params: { password: password }
+
+      get share_dashboard_path(token)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Acme Robotics")
+      expect(response.body).to include("Portefeuille")
+    end
+  end
+
+  describe "GET /share/:token/investments/:id" do
+    let!(:investment) { create(:investment, company_name: "Acme Robotics") }
+
+    it "renders the read-only investment fiche with a valid session" do
+      post unlock_share_path(token), params: { password: password }
+
+      get share_investment_path(token, investment)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Acme Robotics")
+      expect(response.body).not_to include("Modifier")
+      expect(response.body).not_to include("Supprimer")
+      expect(response.body).not_to include("+ Update")
+    end
+  end
 end

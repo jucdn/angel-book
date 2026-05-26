@@ -1,0 +1,28 @@
+<h1 class="text-2xl font-bold mb-6">Portefeuille</h1>
+
+<%= render "dashboard/kpis",
+    total_invested: @total_invested,
+    total_estimated_value: @total_estimated_value,
+    tvpi: @tvpi,
+    irr: @irr,
+    active_count: @active_count,
+    exited_count: @exited_count,
+    written_off_count: @written_off_count,
+    runway_alerts_count: @runway_alerts_count %>
+
+<%= render "dashboard/charts",
+    sector_breakdown: @sector_breakdown,
+    stage_breakdown: @stage_breakdown %>
+
+<% alert_investments = Investment.active.includes(:snapshots).select(&:runway_alert?) %>
+<%= render "dashboard/runway_alerts",
+    alert_investments: alert_investments,
+    link_to_investment: ->(inv) { share_investment_path(params[:token], inv) } %>
+
+<div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden mt-8">
+  <div class="px-4 py-3 border-b border-gray-800 text-sm font-medium text-gray-300">Investissements</div>
+  <%= render "investments/table",
+      investments: @investments,
+      editable: false,
+      link_to_investment: ->(inv) { share_investment_path(params[:token], inv) } %>
+</div>
