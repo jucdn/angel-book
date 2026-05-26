@@ -1,0 +1,56 @@
+<%# locals: investment:, snapshots:, editable: true %>
+<% editable = local_assigns.fetch(:editable, true) %>
+<% if snapshots.any? %>
+  <div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-800">
+      <h2 class="text-sm font-medium text-gray-300">Historique des mises à jour</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-xs text-gray-500 uppercase tracking-wider border-b border-gray-800">
+            <th class="text-left px-6 py-3">Date</th>
+            <th class="text-right px-6 py-3">Val. estimée</th>
+            <th class="text-right px-6 py-3">MRR</th>
+            <th class="text-right px-6 py-3">ARR</th>
+            <th class="text-center px-6 py-3">Runway</th>
+            <th class="text-center px-6 py-3">Effectifs</th>
+            <th class="text-left px-6 py-3">Notes</th>
+            <% if editable %>
+              <th class="px-6 py-3"></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-800">
+          <% snapshots.each do |snap| %>
+            <% snap_critical = snap.runway_months.present? && snap.runway_months < 6 %>
+            <tr class="hover:bg-gray-800/30 transition-colors">
+              <td class="px-6 py-3 text-gray-300"><%= snap.snapshot_date.strftime("%d/%m/%Y") %></td>
+              <td class="px-6 py-3 text-right text-green-400">
+                <%= snap.current_valuation ? "€#{number_with_delimiter(snap.current_valuation.to_i)}" : "—" %>
+              </td>
+              <td class="px-6 py-3 text-right">
+                <%= snap.mrr ? "€#{number_with_delimiter(snap.mrr.to_i)}" : "—" %>
+              </td>
+              <td class="px-6 py-3 text-right">
+                <%= snap.arr ? "€#{number_with_delimiter(snap.arr.to_i)}" : "—" %>
+              </td>
+              <td class="px-6 py-3 text-center <%= snap_critical ? 'text-red-400' : '' %>">
+                <%= snap.runway_months ? "#{snap.runway_months} mois" : "—" %>
+              </td>
+              <td class="px-6 py-3 text-center"><%= snap.headcount || "—" %></td>
+              <td class="px-6 py-3 text-gray-400 max-w-xs truncate"><%= snap.notes || "—" %></td>
+              <% if editable %>
+                <td class="px-6 py-3 text-right">
+                  <%= button_to "×", investment_snapshot_path(investment, snap), method: :delete,
+                      class: "text-gray-600 hover:text-red-400 text-lg leading-none bg-transparent cursor-pointer transition-colors",
+                      data: { turbo_confirm: "Supprimer cette mise à jour ?" } %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>

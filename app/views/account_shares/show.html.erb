@@ -1,0 +1,83 @@
+<h1 class="text-2xl font-bold mb-6">Partage du portfolio</h1>
+
+<div class="max-w-2xl bg-gray-900 border border-gray-800 rounded-xl p-6">
+  <% if flash[:share_url].present? %>
+    <%# State B: just-generated reveal %>
+    <div class="bg-amber-900/30 border border-amber-800 text-amber-200 rounded-lg p-4 mb-6 text-sm">
+      ⚠ Copie ces informations maintenant — le mot de passe ne sera plus affiché ensuite.
+    </div>
+
+    <div class="space-y-4">
+      <div>
+        <label class="text-xs uppercase text-gray-500 tracking-wider">URL</label>
+        <div class="mt-1 flex gap-2">
+          <input type="text" value="<%= flash[:share_url] %>" readonly
+                 class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono"
+                 onclick="this.select()">
+        </div>
+      </div>
+
+      <div>
+        <label class="text-xs uppercase text-gray-500 tracking-wider">Mot de passe</label>
+        <div class="mt-1 flex gap-2">
+          <input type="text" value="<%= flash[:share_password] %>" readonly
+                 class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono"
+                 onclick="this.select()">
+        </div>
+      </div>
+
+      <%= link_to "J'ai copié, continuer", account_share_path,
+          class: "inline-block mt-4 bg-violet-600 hover:bg-violet-500 text-white text-sm px-4 py-2 rounded-lg transition-colors" %>
+    </div>
+
+  <% elsif current_user.share_enabled? %>
+    <%# State C: active link %>
+    <div class="space-y-4">
+      <div>
+        <label class="text-xs uppercase text-gray-500 tracking-wider">URL</label>
+        <div class="mt-1">
+          <input type="text" value="<%= share_url(current_user.share_token) %>" readonly
+                 class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono"
+                 onclick="this.select()">
+        </div>
+      </div>
+
+      <div>
+        <label class="text-xs uppercase text-gray-500 tracking-wider">Mot de passe</label>
+        <p class="mt-1 text-gray-500 text-sm font-mono">•••••••••••• (masqué)</p>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <%= form_with url: account_share_path, method: :post, local: true, class: "flex-1" do |f| %>
+          <%= f.password_field :password,
+              placeholder: "Nouveau mot de passe (min 12 caractères)",
+              required: true,
+              minlength: 12,
+              class: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm" %>
+          <%= f.submit "Régénérer (nouveau mot de passe)",
+              class: "mt-2 w-full bg-gray-700 hover:bg-gray-600 text-white text-sm px-4 py-2 rounded-lg cursor-pointer transition-colors" %>
+        <% end %>
+
+        <%= button_to "Révoquer", account_share_path, method: :delete,
+            class: "bg-red-900/40 hover:bg-red-900/60 border border-red-800 text-red-300 text-sm px-4 py-2 rounded-lg cursor-pointer transition-colors h-fit",
+            data: { turbo_confirm: "Le lien deviendra immédiatement invalide. Continuer ?" } %>
+      </div>
+    </div>
+
+  <% else %>
+    <%# State A: no share yet %>
+    <p class="text-gray-400 mb-6 text-sm">
+      Aucun lien actif. Génère-en un en définissant un mot de passe — tu le communiqueras ensuite à ton destinataire par un canal séparé du lien.
+    </p>
+
+    <%= form_with url: account_share_path, method: :post, local: true, class: "space-y-4" do |f| %>
+      <%= f.password_field :password,
+          placeholder: "Mot de passe (min 12 caractères)",
+          required: true,
+          minlength: 12,
+          class: "w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm" %>
+      <%= f.submit "Générer le lien",
+          class: "bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium px-4 py-2 rounded-lg cursor-pointer transition-colors" %>
+    <% end %>
+  <% end %>
+</div>

@@ -1,98 +1,21 @@
 <h1 class="text-2xl font-bold mb-6">Portefeuille</h1>
 
-<%# KPI cards %>
-<div class="grid grid-cols-2 lg:grid-cols-6 gap-4 mb-8">
-  <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
-    <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Capital investi</p>
-    <p class="text-2xl font-bold">€<%= number_with_delimiter(@total_invested.to_i) %></p>
-  </div>
+<%= render "kpis",
+    total_invested: @total_invested,
+    total_estimated_value: @total_estimated_value,
+    tvpi: @tvpi,
+    irr: @irr,
+    active_count: @active_count,
+    exited_count: @exited_count,
+    written_off_count: @written_off_count,
+    runway_alerts_count: @runway_alerts_count %>
 
-  <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
-    <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Valeur estimée</p>
-    <p class="text-2xl font-bold text-green-400">€<%= number_with_delimiter(@total_estimated_value.to_i) %></p>
-  </div>
+<%= render "charts",
+    sector_breakdown: @sector_breakdown,
+    stage_breakdown: @stage_breakdown %>
 
-  <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
-    <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Multiple (TVPI)</p>
-    <p class="text-2xl font-bold text-blue-400"><%= number_with_precision(@tvpi, precision: 2) %>×</p>
-  </div>
-
-  <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
-    <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">TRI</p>
-    <% if @irr %>
-      <p class="text-2xl font-bold <%= @irr >= 0 ? 'text-green-400' : 'text-red-400' %>">
-        <%= number_with_precision(@irr * 100, precision: 1) %>%
-      </p>
-    <% else %>
-      <p class="text-2xl font-bold text-gray-600">N/A</p>
-    <% end %>
-  </div>
-
-  <div class="bg-gray-900 border border-gray-800 rounded-xl p-4">
-    <p class="text-xs text-gray-500 uppercase tracking-wider mb-2">Participations</p>
-    <p class="text-2xl font-bold"><%= @active_count + @exited_count + @written_off_count %></p>
-    <p class="text-xs text-gray-600 mt-1">
-      <%= @active_count %> actives · <%= @exited_count %> sorties · <%= @written_off_count %> RIP
-    </p>
-  </div>
-
-  <div class="bg-gray-900 border border-<%= @runway_alerts_count > 0 ? 'red-800' : 'gray-800' %> rounded-xl p-4">
-    <p class="text-xs <%= @runway_alerts_count > 0 ? 'text-red-400' : 'text-gray-500' %> uppercase tracking-wider mb-2">
-      <%= @runway_alerts_count > 0 ? "⚠ Alertes runway" : "Alertes runway" %>
-    </p>
-    <p class="text-2xl font-bold <%= @runway_alerts_count > 0 ? 'text-red-400' : 'text-gray-500' %>">
-      <%= @runway_alerts_count %>
-    </p>
-    <p class="text-xs text-gray-600 mt-1">runway &lt; 6 mois</p>
-  </div>
-</div>
-
-<%# Charts %>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-  <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
-    <p class="text-sm font-medium text-gray-300 mb-4">Répartition par secteur</p>
-    <% if @sector_breakdown.any? %>
-      <%= pie_chart @sector_breakdown.transform_keys(&:humanize),
-          donut: true,
-          colors: %w[#7c3aed #06b6d4 #a6e3a1 #fab387 #f9e2af #89b4fa #f38ba8],
-          legend: true,
-          height: "220px" %>
-    <% else %>
-      <p class="text-gray-600 text-sm text-center py-8">Aucune donnée</p>
-    <% end %>
-  </div>
-
-  <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
-    <p class="text-sm font-medium text-gray-300 mb-4">Répartition par stade</p>
-    <% if @stage_breakdown.any? %>
-      <%= pie_chart @stage_breakdown.transform_keys(&:humanize),
-          donut: true,
-          colors: %w[#89b4fa #cba6f7 #f9e2af #fab387 #f38ba8],
-          legend: true,
-          height: "220px" %>
-    <% else %>
-      <p class="text-gray-600 text-sm text-center py-8">Aucune donnée</p>
-    <% end %>
-  </div>
-</div>
-
-<%# Runway alerts %>
 <% alert_investments = Investment.active.includes(:snapshots).select(&:runway_alert?) %>
-<% if alert_investments.any? %>
-  <div class="bg-red-900/20 border border-red-800 rounded-xl p-6 mb-6">
-    <h2 class="text-sm font-medium text-red-400 mb-4">⚠ Startups avec runway critique (&lt; 6 mois)</h2>
-    <div class="space-y-2">
-      <% alert_investments.each do |inv| %>
-        <div class="flex items-center justify-between text-sm">
-          <%= link_to inv.company_name, inv, class: "text-white hover:text-violet-400 font-medium transition-colors" %>
-          <span class="text-red-400 font-bold">
-            <%= inv.latest_snapshot.runway_months %> mois de runway
-          </span>
-        </div>
-      <% end %>
-    </div>
-  </div>
-<% end %>
+<%= render "runway_alerts", alert_investments: alert_investments %>
 
 <% if Investment.count == 0 %>
   <div class="text-center py-16 text-gray-500">

@@ -1,0 +1,86 @@
+<%# locals: investments:, editable: true, link_to_investment: ->(inv) { investment_path(inv) } %>
+<% editable = local_assigns.fetch(:editable, true) %>
+<% link_to_investment = local_assigns.fetch(:link_to_investment) { ->(inv) { investment_path(inv) } } %>
+<div class="overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead>
+      <tr class="text-xs text-gray-500 uppercase tracking-wider border-b border-gray-800">
+        <th class="text-left px-4 py-3">Société</th>
+        <th class="text-left px-4 py-3">Secteur</th>
+        <th class="text-right px-4 py-3">Investi</th>
+        <th class="text-right px-4 py-3">Val. estimée</th>
+        <th class="text-right px-4 py-3">Multiple</th>
+        <th class="text-right px-4 py-3">MRR</th>
+        <th class="text-center px-4 py-3">Runway</th>
+        <th class="text-center px-4 py-3">Statut</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-800">
+      <% investments.each do |inv| %>
+        <% latest = inv.latest_snapshot %>
+        <tr class="hover:bg-gray-800/50 cursor-pointer transition-colors"
+            onclick="window.location='<%= link_to_investment.call(inv) %>'">
+          <td class="px-4 py-3 font-medium text-white"><%= inv.company_name %></td>
+          <td class="px-4 py-3 text-gray-400"><%= inv.sector&.humanize || "—" %></td>
+          <td class="px-4 py-3 text-right">€<%= number_with_delimiter(inv.invested_amount.to_i) %></td>
+          <td class="px-4 py-3 text-right">
+            <% if inv.realized_exit? %>
+              <span class="text-yellow-400">€<%= number_with_delimiter(inv.exit_amount.to_i) %></span>
+              <span class="text-xs text-gray-500 ml-1">cédé</span>
+            <% elsif latest&.current_valuation %>
+              <span class="text-green-400">€<%= number_with_delimiter(latest.current_valuation.to_i) %></span>
+            <% elsif !inv.written_off? %>
+              <span class="text-gray-500">€<%= number_with_delimiter(inv.invested_amount.to_i) %></span>
+            <% else %>
+              <span class="text-gray-600">—</span>
+            <% end %>
+          </td>
+          <td class="px-4 py-3 text-right">
+            <% if inv.multiple %>
+              <span class="<%= inv.realized_exit? ? 'text-yellow-400' : 'text-blue-400' %>">
+                <%= number_with_precision(inv.multiple, precision: 1) %>×
+              </span>
+            <% else %>
+              <span class="text-gray-600">—</span>
+            <% end %>
+          </td>
+          <td class="px-4 py-3 text-right">
+            <%= latest&.mrr ? "€#{number_with_delimiter(latest.mrr.to_i)}" : "—" %>
+          </td>
+          <td class="px-4 py-3 text-center">
+            <% if latest&.runway_months %>
+              <% critical = latest.runway_months < 6 %>
+              <span class="<%= critical ? 'text-red-400 font-bold' : 'text-green-400' %>">
+                <%= "⚠ " if critical %><%= latest.runway_months %> mois
+              </span>
+            <% else %>
+              <span class="text-gray-600">—</span>
+            <% end %>
+          </td>
+          <td class="px-4 py-3 text-center">
+            <% badge = case inv.status
+               when "active"      then "bg-green-900/50 text-green-400 border-green-800"
+               when "exited"      then "bg-yellow-900/50 text-yellow-400 border-yellow-800"
+               when "written_off" then "bg-gray-800 text-gray-500 border-gray-700"
+               end %>
+            <span class="text-xs px-2 py-1 rounded-full border <%= badge %>">
+              <%= inv.status == "written_off" ? "Write-off" : inv.status.capitalize %>
+            </span>
+          </td>
+        </tr>
+      <% end %>
+
+      <% if investments.empty? %>
+        <tr>
+          <td colspan="8" class="px-4 py-12 text-center text-gray-500">
+            Aucun investissement.
+            <% if editable %>
+              <%= link_to "Créer le premier", new_investment_path,
+                  class: "text-violet-400 hover:underline ml-1" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

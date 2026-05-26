@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Snapshots", type: :system do
+  before { sign_in create(:user) }
+
   let!(:investment) { create(:investment, company_name: "Startup Z", invested_amount: 50_000) }
 
   describe "adding a snapshot inline" do

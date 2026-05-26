@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta charset="utf-8">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <title>Angel Book — Vue partagée</title>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="bg-gray-950 text-gray-100 min-h-screen">
+    <div class="bg-amber-900/30 border-b border-amber-800 px-6 py-2">
+      <div class="max-w-7xl mx-auto flex items-center justify-between text-sm">
+        <span class="text-amber-300">Angel Book — Vue partagée • Lecture seule</span>
+        <% if session[:share_token].present? && params[:token].present? %>
+          <%= button_to "Quitter", share_sign_out_path(params[:token]), method: :delete,
+              class: "text-amber-300 hover:text-amber-100 bg-transparent cursor-pointer" %>
+        <% end %>
+      </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+      <% if flash[:alert] %>
+        <div class="mb-6 bg-red-900/50 border border-red-700 text-red-300 px-4 py-3 rounded-lg text-sm">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+      <%= yield %>
+    </main>
+  </body>
+</html>
