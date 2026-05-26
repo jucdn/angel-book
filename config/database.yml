@@ -90,6 +90,7 @@ production:
     database: ba_portfolio_production
     username: ba_portfolio
     password: <%= ENV["BA_PORTFOLIO_DATABASE_PASSWORD"] %>
+    host: <%= ENV["DB_HOST"] %>
   cache:
     <<: *primary_production
     database: ba_portfolio_production_cache
