@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Investments", type: :system do
+  before { sign_in create(:user) }
+
   describe "creating an investment" do
     it "saves and redirects to the show page" do
       visit new_investment_path

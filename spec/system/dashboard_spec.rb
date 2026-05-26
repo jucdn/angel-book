@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Dashboard", type: :system do
+  before { sign_in create(:user) }
+
   context "with investments and snapshots" do
     before do
       inv1 = create(:investment, invested_amount: 50_000, status: "active", sector: "fintech")

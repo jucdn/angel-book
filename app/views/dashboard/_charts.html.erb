@@ -1,0 +1,28 @@
+<%# locals: sector_breakdown:, stage_breakdown: %>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+  <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+    <p class="text-sm font-medium text-gray-300 mb-4">Répartition par secteur</p>
+    <% if sector_breakdown.any? %>
+      <%= pie_chart sector_breakdown.transform_keys(&:humanize),
+          donut: true,
+          colors: %w[#7c3aed #06b6d4 #a6e3a1 #fab387 #f9e2af #89b4fa #f38ba8],
+          legend: true,
+          height: "220px" %>
+    <% else %>
+      <p class="text-gray-600 text-sm text-center py-8">Aucune donnée</p>
+    <% end %>
+  </div>
+
+  <div class="bg-gray-900 border border-gray-800 rounded-xl p-6">
+    <p class="text-sm font-medium text-gray-300 mb-4">Répartition par stade</p>
+    <% if stage_breakdown.any? %>
+      <%= pie_chart stage_breakdown.transform_keys(&:humanize),
+          donut: true,
+          colors: %w[#89b4fa #cba6f7 #f9e2af #fab387 #f38ba8],
+          legend: true,
+          height: "220px" %>
+    <% else %>
+      <p class="text-gray-600 text-sm text-center py-8">Aucune donnée</p>
+    <% end %>
+  </div>
+</div>

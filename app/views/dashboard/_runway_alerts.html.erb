@@ -1,0 +1,18 @@
+<%# locals: alert_investments:, link_to_investment: ->(inv) { investment_path(inv) } %>
+<% link_to_investment = local_assigns.fetch(:link_to_investment) { ->(inv) { investment_path(inv) } } %>
+<% if alert_investments.any? %>
+  <div class="bg-red-900/20 border border-red-800 rounded-xl p-6 mb-6">
+    <h2 class="text-sm font-medium text-red-400 mb-4">⚠ Startups avec runway critique (&lt; 6 mois)</h2>
+    <div class="space-y-2">
+      <% alert_investments.each do |inv| %>
+        <div class="flex items-center justify-between text-sm">
+          <%= link_to inv.company_name, link_to_investment.call(inv),
+              class: "text-white hover:text-violet-400 font-medium transition-colors" %>
+          <span class="text-red-400 font-bold">
+            <%= inv.latest_snapshot.runway_months %> mois de runway
+          </span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+<% end %>
