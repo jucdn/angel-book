@@ -1,0 +1,74 @@
+<%# locals: investment:, latest_snapshot:, editable: true %>
+<% editable = local_assigns.fetch(:editable, true) %>
+<div class="bg-gray-900 rounded-xl border border-gray-800 p-6">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-xs text-gray-500 uppercase tracking-wider">Dernière mise à jour</h2>
+    <% if editable %>
+      <%= link_to "+ Update", new_investment_snapshot_path(investment),
+          class: "text-sm bg-violet-600 hover:bg-violet-500 text-white px-3 py-1.5 rounded-lg transition-colors",
+          data: { turbo_frame: "snapshot_form" } %>
+    <% end %>
+  </div>
+
+  <% if latest_snapshot %>
+    <% multiple = investment.multiple %>
+    <% multiple_positive = multiple && multiple > 1 %>
+    <dl class="space-y-3 text-sm">
+      <div class="flex justify-between">
+        <dt class="text-gray-400">Valorisation estimée</dt>
+        <dd class="font-medium <%= multiple_positive ? 'text-green-400' : 'text-gray-100' %>">
+          <% if latest_snapshot.current_valuation %>
+            €<%= number_with_delimiter(latest_snapshot.current_valuation.to_i) %>
+            <span class="text-gray-500 text-xs ml-1">(<%= number_with_precision(multiple, precision: 1) %>×)</span>
+          <% else %>
+            —
+          <% end %>
+        </dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-400">MRR</dt>
+        <dd><%= latest_snapshot.mrr ? "€#{number_with_delimiter(latest_snapshot.mrr.to_i)}" : "—" %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-400">ARR</dt>
+        <dd><%= latest_snapshot.arr ? "€#{number_with_delimiter(latest_snapshot.arr.to_i)}" : "—" %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-400">Runway</dt>
+        <% runway_critical = latest_snapshot.runway_months.present? && latest_snapshot.runway_months < 6 %>
+        <dd class="<%= runway_critical ? 'text-red-400 font-bold' : '' %>">
+          <%= latest_snapshot.runway_months ? "#{latest_snapshot.runway_months} mois" : "—" %>
+          <%= " ⚠" if runway_critical %>
+        </dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-gray-400">Effectifs</dt>
+        <dd><%= latest_snapshot.headcount || "—" %></dd>
+      </div>
+      <% if latest_snapshot.last_round_amount.present? %>
+        <div class="flex justify-between">
+          <dt class="text-gray-400">Dernier tour</dt>
+          <dd>€<%= number_with_delimiter(latest_snapshot.last_round_amount.to_i) %>
+            <% if latest_snapshot.last_round_date %>
+              <span class="text-gray-500 text-xs">— <%= latest_snapshot.last_round_date.strftime("%b %Y") %></span>
+            <% end %>
+          </dd>
+        </div>
+      <% end %>
+      <% if latest_snapshot.notes.present? %>
+        <div class="pt-3 border-t border-gray-800">
+          <p class="text-xs text-gray-500 mb-1">Notes</p>
+          <p class="text-gray-300"><%= latest_snapshot.notes %></p>
+        </div>
+      <% end %>
+    </dl>
+    <p class="text-xs text-gray-600 mt-4">Mis à jour le <%= latest_snapshot.snapshot_date.strftime("%d/%m/%Y") %></p>
+  <% else %>
+    <p class="text-gray-500 text-sm">Aucune donnée. Ajoute une première mise à jour.</p>
+  <% end %>
+
+  <% if editable %>
+    <%= turbo_frame_tag "snapshot_form" %>
+    <%= turbo_frame_tag "exit_form" %>
+  <% end %>
+</div>
