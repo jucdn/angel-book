@@ -33,6 +33,14 @@
     </div>
 
     <div>
+      <%= f.label :vehicle, "Véhicule", class: "block text-sm text-gray-400 mb-1" %>
+      <%= f.select :vehicle,
+          Investment.vehicles.keys.map { |v| [vehicle_label(v), v] },
+          {},
+          class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
+    </div>
+
+    <div>
       <%= f.label :invested_amount, "Ticket investi (€)", class: "block text-sm text-gray-400 mb-1" %>
       <%= f.number_field :invested_amount, step: 1, min: 0,
           class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>

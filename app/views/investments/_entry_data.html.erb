@@ -26,6 +26,10 @@
       <dt class="text-gray-400">Stade</dt>
       <dd><%= investment.stage&.humanize || "—" %></dd>
     </div>
+    <div class="flex justify-between">
+      <dt class="text-gray-400">Véhicule</dt>
+      <dd><%= vehicle_label(investment.vehicle) %></dd>
+    </div>
     <% if investment.website.present? %>
       <div class="flex justify-between">
         <dt class="text-gray-400">Site web</dt>
