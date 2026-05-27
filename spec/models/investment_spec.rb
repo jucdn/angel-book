@@ -45,6 +45,30 @@ RSpec.describe Investment, type: :model do
     end
   end
 
+  describe "vehicle enum" do
+    it "defaults to direct" do
+      expect(build(:investment).vehicle).to eq("direct")
+    end
+
+    it "accepts direct, pea_pme, and holding" do
+      %w[direct pea_pme holding].each do |v|
+        inv = build(:investment, vehicle: v)
+        expect(inv).to be_valid
+        expect(inv.vehicle).to eq(v)
+      end
+    end
+
+    it "raises ArgumentError on unknown vehicle" do
+      expect { build(:investment, vehicle: "crypto_dao") }.to raise_error(ArgumentError)
+    end
+
+    it "exposes scope and predicate methods" do
+      inv = create(:investment, vehicle: "pea_pme")
+      expect(inv).to be_pea_pme
+      expect(Investment.pea_pme).to include(inv)
+    end
+  end
+
   describe "instance methods" do
     let(:investment) { create(:investment, invested_amount: 50_000) }
 

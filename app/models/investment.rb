@@ -5,6 +5,7 @@ class Investment < ApplicationRecord
   STAGES  = %w[pre_seed seed series_a series_b growth].freeze
 
   enum :status, { active: "active", exited: "exited", written_off: "written_off" }
+  enum :vehicle, { direct: "direct", pea_pme: "pea_pme", holding: "holding" }
 
   validates :company_name,    presence: true
   validates :invested_amount, presence: true, numericality: { greater_than: 0 }
