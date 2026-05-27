@@ -63,7 +63,7 @@ class InvestmentsController < ApplicationController
 
   def investment_params
     params.require(:investment).permit(
-      :company_name, :sector, :stage, :invested_amount,
+      :company_name, :sector, :stage, :vehicle, :invested_amount,
       :entry_valuation, :equity_percentage, :investment_date,
       :status, :website, :description
     )

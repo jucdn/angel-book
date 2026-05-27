@@ -82,4 +82,40 @@ RSpec.describe "Investments", type: :system do
       expect(page).not_to have_content("ToDelete")
     end
   end
+
+  describe "vehicle" do
+    it "saves the selected vehicle and shows it on the detail page" do
+      visit new_investment_path
+
+      fill_in "Nom de la société", with: "Vehicle Co"
+      fill_in "Ticket investi (€)", with: "10000"
+      fill_in "Date d'investissement", with: "2025-03-01"
+      select "Saas b2b", from: "Secteur"
+      select "Seed", from: "Stade"
+      select "PEA-PME", from: "Véhicule"
+
+      click_button "Créer l'investissement"
+
+      expect(page).to have_content("Vehicle Co")
+      within("dl") do
+        expect(page).to have_content("Véhicule")
+        expect(page).to have_content("PEA-PME")
+      end
+    end
+
+    it "allows editing the vehicle of an existing investment" do
+      inv = create(:investment, company_name: "Editable Co", vehicle: "direct")
+
+      visit edit_investment_path(inv)
+      select "Holding", from: "Véhicule"
+      click_button "Enregistrer"
+
+      expect(page).to have_content("Editable Co")
+      within("dl") do
+        expect(page).to have_content("Véhicule")
+        expect(page).to have_content("Holding")
+      end
+      expect(inv.reload.vehicle).to eq("holding")
+    end
+  end
 end
