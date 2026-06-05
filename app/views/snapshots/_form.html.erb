@@ -18,7 +18,7 @@
 
     <div>
       <%= f.label :current_valuation, "Valorisation estimée (€)", class: "block text-xs text-gray-400 mb-1" %>
-      <%= f.number_field :current_valuation, step: 1000, min: 0,
+      <%= f.number_field :current_valuation, step: 1, min: 0,
           class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
     </div>
 
@@ -30,13 +30,13 @@
 
     <div>
       <%= f.label :mrr, "MRR (€)", class: "block text-xs text-gray-400 mb-1" %>
-      <%= f.number_field :mrr, step: 100, min: 0,
+      <%= f.number_field :mrr, step: 1, min: 0,
           class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
     </div>
 
     <div>
       <%= f.label :arr, "ARR (€)", class: "block text-xs text-gray-400 mb-1" %>
-      <%= f.number_field :arr, step: 1000, min: 0,
+      <%= f.number_field :arr, step: 1, min: 0,
           class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
     </div>
 
@@ -48,7 +48,7 @@
 
     <div>
       <%= f.label :last_round_amount, "Montant dernier tour (€)", class: "block text-xs text-gray-400 mb-1" %>
-      <%= f.number_field :last_round_amount, step: 10_000, min: 0,
+      <%= f.number_field :last_round_amount, step: 1, min: 0,
           class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
     </div>
 
