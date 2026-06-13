@@ -83,6 +83,23 @@
       <%= f.text_area :description, rows: 3,
           class: "w-full bg-gray-800 border border-gray-700 text-gray-100 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-violet-500" %>
     </div>
+
+    <div class="md:col-span-2">
+      <%= f.label :logo, "Logo", class: "block text-sm text-gray-400 mb-1" %>
+      <% if investment.logo.attached? %>
+        <div class="flex items-center gap-3 mb-2">
+          <%= image_tag investment.logo,
+              class: "w-10 h-10 rounded object-contain bg-gray-800 border border-gray-700" %>
+          <label class="flex items-center gap-2 text-sm text-gray-400">
+            <%= f.check_box :remove_logo,
+                class: "rounded border-gray-700 bg-gray-800 text-violet-600" %>
+            Supprimer le logo
+          </label>
+        </div>
+      <% end %>
+      <%= f.file_field :logo, accept: "image/png,image/jpeg,image/webp",
+          class: "w-full text-sm text-gray-400 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gray-700 file:text-gray-100 file:cursor-pointer hover:file:bg-gray-600" %>
+    </div>
   </div>
 
   <div class="flex gap-3 pt-2">
