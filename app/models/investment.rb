@@ -1,5 +1,7 @@
 class Investment < ApplicationRecord
   has_many :snapshots, dependent: :destroy
+  has_one_attached :logo
+  attr_accessor :remove_logo
 
   SECTORS = %w[fintech saas_b2b health deeptech marketplace consumer other].freeze
   STAGES  = %w[pre_seed seed series_a series_b growth].freeze
@@ -17,6 +19,9 @@ class Investment < ApplicationRecord
   validates :stage,       inclusion: { in: STAGES },  allow_nil: true
   validates :exit_date,   presence: true, if: -> { exit_amount.present? }
   validates :exit_amount, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validate :acceptable_logo
+
+  after_save :purge_logo_if_requested
 
   # ---------- Instance methods ----------
 
@@ -101,5 +106,25 @@ class Investment < ApplicationRecord
 
   def self.runway_alerts_count
     active.includes(:snapshots).count(&:runway_alert?)
+  end
+
+  private
+
+  def acceptable_logo
+    return unless logo.attached?
+
+    unless logo.content_type.in?(%w[image/png image/jpeg image/webp])
+      errors.add(:logo, "doit être une image PNG, JPEG ou WebP")
+    end
+
+    if logo.byte_size > 2.megabytes
+      errors.add(:logo, "ne doit pas dépasser 2 Mo")
+    end
+  end
+
+  def purge_logo_if_requested
+    return unless ActiveModel::Type::Boolean.new.cast(remove_logo)
+
+    logo.purge_later if logo.attached?
   end
 end

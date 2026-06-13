@@ -179,4 +179,56 @@ RSpec.describe Investment, type: :model do
       end
     end
   end
+
+  describe "logo attachment" do
+    let(:investment) { build(:investment) }
+
+    def attach(io:, filename:, content_type:)
+      investment.logo.attach(io: io, filename: filename, content_type: content_type)
+    end
+
+    it "accepts a valid PNG logo" do
+      attach(
+        io: Rails.root.join("spec/fixtures/files/logo.png").open,
+        filename: "logo.png",
+        content_type: "image/png"
+      )
+      expect(investment).to be_valid
+      expect(investment.logo).to be_attached
+    end
+
+    it "rejects a non-image content type" do
+      attach(
+        io: StringIO.new("not an image"),
+        filename: "doc.pdf",
+        content_type: "application/pdf"
+      )
+      expect(investment).not_to be_valid
+      expect(investment.errors[:logo]).to include("doit être une image PNG, JPEG ou WebP")
+    end
+
+    it "rejects a logo larger than 2 Mo" do
+      attach(
+        io: StringIO.new("a" * 3.megabytes),
+        filename: "big.png",
+        content_type: "image/png"
+      )
+      expect(investment).not_to be_valid
+      expect(investment.errors[:logo]).to include("ne doit pas dépasser 2 Mo")
+    end
+
+    it "purges the logo when remove_logo is set" do
+      investment.save!
+      investment.logo.attach(
+        io: Rails.root.join("spec/fixtures/files/logo.png").open,
+        filename: "logo.png",
+        content_type: "image/png"
+      )
+      investment.save!
+      expect(investment.logo).to be_attached
+
+      investment.update!(remove_logo: "1")
+      expect(investment.reload.logo).not_to be_attached
+    end
+  end
 end
