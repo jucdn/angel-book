@@ -1,6 +1,6 @@
 class SnapshotsController < ApplicationController
   before_action :set_investment
-  before_action :set_snapshot, only: [:destroy]
+  before_action :set_snapshot, only: [ :destroy ]
 
   def new
     @snapshot = @investment.snapshots.new(snapshot_date: Date.today)
