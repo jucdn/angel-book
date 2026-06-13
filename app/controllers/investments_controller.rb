@@ -65,7 +65,7 @@ class InvestmentsController < ApplicationController
     params.require(:investment).permit(
       :company_name, :sector, :stage, :vehicle, :invested_amount,
       :entry_valuation, :equity_percentage, :investment_date,
-      :status, :website, :description
+      :status, :website, :description, :logo, :remove_logo
     )
   end
 
