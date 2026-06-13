@@ -2,7 +2,7 @@ class InvestmentsController < ApplicationController
   before_action :set_investment, only: [ :show, :edit, :update, :destroy, :exit_form, :record_exit ]
 
   def index
-    @investments = Investment.all
+    @investments = Investment.with_attached_logo
     @investments = @investments.where(sector: params[:sector]) if params[:sector].present?
     @investments = @investments.where(status: params[:status]) if params[:status].present?
     if params[:q].present?

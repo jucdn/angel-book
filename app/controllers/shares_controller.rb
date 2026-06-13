@@ -34,7 +34,7 @@ class SharesController < ApplicationController
     @written_off_count     = Investment.written_off.count
     @sector_breakdown      = Investment.where.not(sector: nil).group(:sector).sum(:invested_amount)
     @stage_breakdown       = Investment.where.not(stage: nil).group(:stage).sum(:invested_amount)
-    @investments           = Investment.order(investment_date: :desc)
+    @investments           = Investment.with_attached_logo.order(investment_date: :desc)
   end
 
   def investment
