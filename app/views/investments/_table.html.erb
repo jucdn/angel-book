@@ -20,7 +20,15 @@
         <% latest = inv.latest_snapshot %>
         <tr class="hover:bg-gray-800/50 cursor-pointer transition-colors"
             onclick="window.location='<%= link_to_investment.call(inv) %>'">
-          <td class="px-4 py-3 font-medium text-white"><%= inv.company_name %></td>
+          <td class="px-4 py-3 font-medium text-white">
+            <div class="flex items-center gap-2">
+              <% if inv.logo.attached? %>
+                <%= image_tag inv.logo,
+                    class: "w-6 h-6 rounded object-contain bg-gray-800 border border-gray-700 shrink-0" %>
+              <% end %>
+              <span><%= inv.company_name %></span>
+            </div>
+          </td>
           <td class="px-4 py-3 text-gray-400"><%= inv.sector&.humanize || "—" %></td>
           <td class="px-4 py-3 text-right">€<%= number_with_delimiter(inv.invested_amount.to_i) %></td>
           <td class="px-4 py-3 text-right">
